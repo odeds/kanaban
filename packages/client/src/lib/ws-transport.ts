@@ -79,8 +79,16 @@ class WsTransport {
   disconnect(): void {
     this.shouldReconnect = false;
     if (this.reconnectTimer !== null) clearTimeout(this.reconnectTimer);
-    this.ws?.close();
-    this.ws = null;
+    if (this.ws) {
+      // Null out handlers before closing so in-flight messages from the dying
+      // connection don't fire into the shared messageHandlers set.
+      this.ws.onopen = null;
+      this.ws.onmessage = null;
+      this.ws.onclose = null;
+      this.ws.onerror = null;
+      this.ws.close();
+      this.ws = null;
+    }
   }
 
   private notify(status: Parameters<StatusHandler>[0]): void {

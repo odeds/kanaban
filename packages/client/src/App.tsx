@@ -1,18 +1,10 @@
 import { Board } from '@/components/board/Board';
+import { useZustandAdapter } from '@/adapters/zustand/useZustandAdapter';
 
-// Temporary stub — will be replaced by real state adapters in later steps.
+// To add a second adapter: import it here and switch on import.meta.env.VITE_STATE_ADAPTER.
 function App() {
-  return (
-    <Board
-      cards={{}}
-      columnCardIds={{ todo: [], 'in-progress': [], done: [] }}
-      userIds={[]}
-      onCreateCard={() => {}}
-      onEditCard={() => {}}
-      onDeleteCard={() => {}}
-      onMoveCard={() => {}}
-    />
-  );
+  const adapter = useZustandAdapter();
+  return <Board {...adapter} />;
 }
 
 export default App;
