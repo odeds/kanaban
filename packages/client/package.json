@@ -1,0 +1,16 @@
+{
+  "name": "@kanaban/client",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "echo 'Add dev server command here'",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@kanaban/shared": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  }
+}
