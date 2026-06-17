@@ -32,3 +32,14 @@ Set up the monorepo with three npm workspace packages — `backend`, `client`, a
 **PR:** [#2](https://github.com/odeds/kanaban/pull/2)
 
 Decided on the tech stack for backend and client. Chose Fastify for the backend because it performs well for real-time use cases and has stronger community support than Express. Considered Hono but ruled it out — it excels in edge and serverless environments, which isn't the target here, so Fastify was the better fit. On the client side, went with Vite + React + Tailwind CSS v4, with shadcn/ui for components and Base UI for headless primitives.
+
+---
+
+## Step 4 — Data Layer & WebSocket Bridge
+**Date:** 2026-06-17
+**Duration:** ~1h 15min
+**PR:** *(TBD)*
+
+This step focused on adding the data layer to the backend and wiring up WebSocket communication between client and server, with minimal tests covering the critical paths. I also updated the `shared` package to use TypeBox for both sides of the wire, so schema definitions aren't duplicated between client and backend.
+
+---
