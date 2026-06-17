@@ -2,3 +2,7 @@ node_modules/
 dist/
 *.tsbuildinfo
 .DS_Store
+
+# Playwright test artifacts
+packages/client/playwright-report/
+packages/client/test-results/

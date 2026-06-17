@@ -5,13 +5,13 @@ Each entry corresponds to a step or PR.
 
 ---
 
-## Step 3 — Backend & Client Stack Setup
+## Step 1 — Research & Planning
 
-**Date:** 2026-06-17
+**Date:** 2026-06-17 *(pre-repo)*
 **Duration:** ~15 min
-**PR:** [#2](https://github.com/odeds/kanaban/pull/2)
+**PR:** —
 
-Decided on the tech stack for backend and client. Chose Fastify for the backend because it performs well for real-time use cases and has stronger community support than Express. Considered Hono but ruled it out — it excels in edge and serverless environments, which isn't the target here, so Fastify was the better fit. On the client side, went with Vite + React + Tailwind CSS v4, with shadcn/ui for components and Base UI for headless primitives.
+Before opening the repo I had a conversation with ChatGPT to think through the task and get a feel for the state management comparison. The main question was which approaches would make for a meaningful comparison — different enough in philosophy to surface real trade-offs, but all realistic choices for a production app. The session helped narrow down the candidate libraries and frame what "different philosophy" actually means in this context.
 
 ---
 
@@ -25,12 +25,10 @@ Set up the monorepo with three npm workspace packages — `backend`, `client`, a
 
 ---
 
-## Step 1 — Research & Planning
+## Step 3 — Backend & Client Stack Setup
 
-**Date:** 2026-06-17 *(pre-repo)*
+**Date:** 2026-06-17
 **Duration:** ~15 min
-**PR:** —
+**PR:** [#2](https://github.com/odeds/kanaban/pull/2)
 
-Before opening the repo I had a conversation with ChatGPT to think through the task and get a feel for the state management comparison. The main question was which approaches would make for a meaningful comparison — different enough in philosophy to surface real trade-offs, but all realistic choices for a production app. The session helped narrow down the candidate libraries and frame what "different philosophy" actually means in this context.
-
----
+Decided on the tech stack for backend and client. Chose Fastify for the backend because it performs well for real-time use cases and has stronger community support than Express. Considered Hono but ruled it out — it excels in edge and serverless environments, which isn't the target here, so Fastify was the better fit. On the client side, went with Vite + React + Tailwind CSS v4, with shadcn/ui for components and Base UI for headless primitives.

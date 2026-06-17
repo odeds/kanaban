@@ -77,3 +77,4 @@ Both Dockerfiles use the monorepo root as build context (required for access to 
 - **Decisions go in JOURNAL.md, not in code comments** — trade-off reasoning lives in the journal, not inline.
 - **`shared` is the source of truth for types** — don't duplicate type definitions between client and backend.
 - **State layer lives only in `client`** — backend and shared are not aware of which state approach is active.
+- **Don't add tests unless explicitly requested** — do not write test files, test cases, or test infrastructure as part of a task unless the user specifically asks for tests.
