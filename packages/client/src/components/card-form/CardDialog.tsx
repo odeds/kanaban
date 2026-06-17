@@ -21,7 +21,7 @@ export function CardDialog({ open, onClose, onSubmit, mode, initialValues }: Car
   }
 
   return (
-    <Dialog open={open} onOpenChange={(o) => { if (!o) onClose(); }}>
+    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{mode === 'create' ? 'Add card' : 'Edit card'}</DialogTitle>
