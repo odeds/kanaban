@@ -7,7 +7,11 @@ import path from 'path';
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: {
-    alias: { '@': path.resolve(__dirname, './src') },
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+      // Resolve from TS source so Vite never needs a pre-built dist for shared
+      '@kanaban/shared': path.resolve(__dirname, '../../packages/shared/src/index.ts'),
+    },
   },
   test: {
     environment: 'jsdom',
