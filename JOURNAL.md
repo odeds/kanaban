@@ -43,3 +43,12 @@ Decided on the tech stack for backend and client. Chose Fastify for the backend 
 This step focused on adding the data layer to the backend and wiring up WebSocket communication between client and server, with minimal tests covering the critical paths. I also updated the `shared` package to use TypeBox for both sides of the wire, so schema definitions aren't duplicated between client and backend.
 
 ---
+
+## Step 5 — Shared UI Components
+**Date:** 2026-06-17
+**Duration:** ~30 min
+**PR:** [#4](https://github.com/odeds/kanaban/pull/4)
+
+This step focused on building the shared UI layer that the state adapters will consume. The components are intentionally dumb — they receive data and callbacks via props and hold no app state of their own. For card movement, I chose left/right arrow buttons rather than drag-and-drop, since drag-and-drop is explicitly out of scope. Alongside the board components, I installed the building blocks they rely on: shadcn/ui for styled atoms and Base UI for accessible, aria-compatible headless primitives. I also skipped Storybook — in my experience it tends to go unused, and with LLMs it's trivial to generate component stories later if they're ever needed.
+
+---
