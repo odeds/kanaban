@@ -44,8 +44,9 @@ export function CardForm({ initialValues, onSubmit, onCancel, submitLabel = 'Sav
           onChange={(e) => { setTitle(e.target.value); setTitleError(false); }}
           placeholder="Card title"
           aria-invalid={titleError}
+          data-testid="input-title"
         />
-        {titleError && <p className="text-xs text-destructive">Title is required</p>}
+        {titleError && <p className="text-xs text-destructive" data-testid="title-error">Title is required</p>}
       </div>
 
       <div className="flex flex-col gap-1.5">
@@ -55,6 +56,7 @@ export function CardForm({ initialValues, onSubmit, onCancel, submitLabel = 'Sav
           onChange={(e) => setDescription(e.target.value)}
           placeholder="What needs to be done?"
           rows={3}
+          data-testid="input-description"
         />
       </div>
 
@@ -64,12 +66,13 @@ export function CardForm({ initialValues, onSubmit, onCancel, submitLabel = 'Sav
           value={assignee}
           onChange={(e) => setAssignee(e.target.value)}
           placeholder="Who's on it?"
+          data-testid="input-assignee"
         />
       </div>
 
       <div className="flex justify-end gap-2 pt-1">
-        <Button type="button" variant="outline" onClick={onCancel}>Cancel</Button>
-        <Button type="submit">{submitLabel}</Button>
+        <Button type="button" variant="outline" onClick={onCancel} data-testid="form-cancel">Cancel</Button>
+        <Button type="submit" data-testid="form-submit">{submitLabel}</Button>
       </div>
     </form>
   );

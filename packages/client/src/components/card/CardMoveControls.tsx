@@ -18,6 +18,7 @@ export function CardMoveControls({ canMoveLeft, canMoveRight, onMoveLeft, onMove
         disabled={!canMoveLeft}
         onClick={onMoveLeft}
         aria-label="Move to previous column"
+        data-testid="move-left"
       >
         <ChevronLeft className="h-3.5 w-3.5" />
       </Button>
@@ -28,6 +29,7 @@ export function CardMoveControls({ canMoveLeft, canMoveRight, onMoveLeft, onMove
         disabled={!canMoveRight}
         onClick={onMoveRight}
         aria-label="Move to next column"
+        data-testid="move-right"
       >
         <ChevronRight className="h-3.5 w-3.5" />
       </Button>
