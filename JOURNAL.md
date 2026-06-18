@@ -38,7 +38,7 @@ Decided on the tech stack for backend and client. Chose Fastify for the backend 
 ## Step 4 — Data Layer & WebSocket Bridge
 **Date:** 2026-06-17
 **Duration:** ~1h 15min
-**PR:** *(TBD)*
+**PR:** [#3](https://github.com/odeds/kanaban/pull/3)
 
 This step focused on adding the data layer to the backend and wiring up WebSocket communication between client and server, with minimal tests covering the critical paths. I also updated the `shared` package to use TypeBox for both sides of the wire, so schema definitions aren't duplicated between client and backend.
 
@@ -76,7 +76,7 @@ The reuse audit turned up more duplication than expected. `EMPTY_COLUMNS`, `gene
 ## Step 8 — UI/UX Polish, Manual Testing & Docs
 **Date:** 2026-06-18
 **Duration:** ~1.5 hr
-**PR:** *(TBD)*
+**PR:** [#7](https://github.com/odeds/kanaban/pull/7)
 
 With both adapters working, I spent a session on light UI/UX improvements, manual testing, and documentation. On the UX side I switched the card assignee from a free-text input to a dropdown of real users, and moved user-ID generation from the client to the server so a user persists in the all-time assignee list even after disconnecting. I also reworked the theme to a clean light palette with subtle color accents, centered the board within a max-width container, enlarged the move arrows and split them to opposite sides of each card, and added tooltips to the icon buttons. I manually tested the real-time flow across two browser windows — create, edit, delete, move, presence, and optimistic updates all syncing live. Finally I drafted the README: run instructions, how to switch adapters, and the full WebSocket and REST event protocol.
 

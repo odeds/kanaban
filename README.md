@@ -44,10 +44,10 @@ The state layer is selected at build/dev time with the `VITE_STATE_ADAPTER` envi
 
 ```bash
 # Zustand (default — no variable needed)
-npm run dev -w packages/client
+npm run dev
 
 # Redux Toolkit
-VITE_STATE_ADAPTER=redux npm run dev -w packages/client
+VITE_STATE_ADAPTER=redux npm run dev
 ```
 
 | Value | Adapter | Philosophy |
