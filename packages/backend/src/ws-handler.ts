@@ -8,7 +8,8 @@ import { addClient, removeClient, broadcast, sendTo } from './broadcast';
 export function handleWsConnection(socket: WebSocket, _req: FastifyRequest): void {
   addClient(socket);
 
-  const userId = presence.generate();
+  const hintId = (_req.query as Record<string, string>)['userId'];
+  const userId = presence.generate(hintId);
 
   // Tell this client its assigned identity
   sendTo(socket, { type: 'session:init', userId });

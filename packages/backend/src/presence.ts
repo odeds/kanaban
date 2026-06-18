@@ -2,8 +2,10 @@ class PresenceManager {
   private online = new Set<string>();
   private all = new Set<string>();
 
-  generate(): string {
-    const userId = `user-${Math.random().toString(36).slice(2, 8)}`;
+  generate(hint?: string): string {
+    const userId = hint && this.all.has(hint)
+      ? hint
+      : `user-${Math.random().toString(36).slice(2, 8)}`;
     this.online.add(userId);
     this.all.add(userId);
     return userId;

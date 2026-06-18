@@ -99,6 +99,7 @@ export const useZustandStore = create<State & Actions>()(
             break;
           }
           case 'session:init': {
+            localStorage.setItem('kanaban:userId', msg.userId);
             set({ userId: msg.userId }, false, 'session:init');
             break;
           }
@@ -194,8 +195,9 @@ export const useZustandStore = create<State & Actions>()(
       // ── Transport ──────────────────────────────────────────────────────────────
 
       initTransport() {
-        const { userId, applyServerMsg } = get();
-        wsTransport.connect();
+        const { applyServerMsg } = get();
+        const storedUserId = localStorage.getItem('kanaban:userId') ?? undefined;
+        wsTransport.connect(storedUserId);
 
         const unsubMsg = wsTransport.subscribe(applyServerMsg);
         const unsubStatus = wsTransport.onStatus((status) => {

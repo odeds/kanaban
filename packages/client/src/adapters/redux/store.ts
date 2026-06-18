@@ -175,6 +175,7 @@ export function applyServerMsg(msg: ServerMessage): AppThunk {
         dispatch(actions.cardMoved({ cardId: msg.cardId, columnId: msg.columnId, order: msg.order }));
         break;
       case 'session:init':
+        localStorage.setItem('kanaban:userId', msg.userId);
         dispatch(actions.sessionInitReceived(msg.userId));
         break;
       case 'presence:update':
@@ -252,7 +253,8 @@ export const moveCard =
 // ── Transport ─────────────────────────────────────────────────────────────────
 
 export function initTransport(): () => void {
-  wsTransport.connect();
+  const storedUserId = localStorage.getItem('kanaban:userId') ?? undefined;
+  wsTransport.connect(storedUserId);
 
   const unsubMsg = wsTransport.subscribe((msg) => store.dispatch(applyServerMsg(msg)));
   const unsubStatus = wsTransport.onStatus((status) => {

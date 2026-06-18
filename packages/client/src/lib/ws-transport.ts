@@ -11,15 +11,20 @@ class WsTransport {
   private reconnectDelay = 1_000;
   private shouldReconnect = false;
 
-  constructor(private readonly url: string) {}
+  private activeUrl: string;
 
-  connect(): void {
+  constructor(private readonly url: string) {
+    this.activeUrl = url;
+  }
+
+  connect(userId?: string): void {
     this.shouldReconnect = true;
+    this.activeUrl = userId ? `${this.url}?userId=${encodeURIComponent(userId)}` : this.url;
     this.openConnection();
   }
 
   private openConnection(): void {
-    const ws = new WebSocket(this.url);
+    const ws = new WebSocket(this.activeUrl);
     this.ws = ws;
 
     ws.onopen = () => {
