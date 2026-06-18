@@ -52,3 +52,23 @@ This step focused on adding the data layer to the backend and wiring up WebSocke
 This step focused on building the shared UI layer that the state adapters will consume. The components are intentionally dumb — they receive data and callbacks via props and hold no app state of their own. For card movement, I chose left/right arrow buttons rather than drag-and-drop, since drag-and-drop is explicitly out of scope. Alongside the board components, I installed the building blocks they rely on: shadcn/ui for styled atoms and Base UI for accessible, aria-compatible headless primitives. I also skipped Storybook — in my experience it tends to go unused, and with LLMs it's trivial to generate component stories later if they're ever needed.
 
 ---
+
+## Step 6 — Zustand State Adapter
+**Date:** 2026-06-17
+**Duration:** ~45 min
+**PR:** [#5](https://github.com/odeds/kanaban/pull/5)
+
+This step introduced the adapter infrastructure that all state implementations will plug into, then replaced the placeholder stub with a real Zustand adapter. I chose Zustand as the first adapter because it keeps state management close to its simplest possible form — state is just data, and updates are plain function calls. There's no ceremony around actions, reducers, or subscriptions; the store is a flat object you read and mutate directly. That makes it a useful baseline: easy to reason about, and a clean reference point for comparing the approaches that follow.
+
+---
+
+## Step 7 — Redux State Adapter
+**Date:** 2026-06-18
+**Duration:** ~45 min
+**PR:** [#6](https://github.com/odeds/kanaban/pull/6)
+
+This step had two parts: implementing the Redux adapter and auditing what could be shared between adapters. The Redux implementation uses Redux Toolkit — a slice with named reducers for every server message type, plain thunks for mutations, and a self-contained `<ReduxAdapter>` component that owns its own `<Provider>`. The named actions are the point: unlike Zustand, every state change is an identifiable event in the action log.
+
+The reuse audit turned up more duplication than expected. `EMPTY_COLUMNS`, `generateUserId`, the REST fetch calls, the `card:moved` reordering algorithm, and the transport `useEffect` pattern were all identical across both adapters. These were extracted into shared files — `columnUtils.ts`, `constants.ts`, `lib/api.ts`, and `useTransportEffect.ts` — so adapters only contain code that's actually specific to their state management philosophy. The reordering logic also got unit tests since it's the most algorithmic piece.
+
+---
