@@ -1,4 +1,4 @@
-class PresenceManager {
+export class PresenceManager {
   private online = new Set<string>();
   private all = new Set<string>();
 

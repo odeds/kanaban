@@ -82,6 +82,17 @@ With both adapters working, I spent a session on light UI/UX improvements, manua
 
 ---
 
+## Step 9 — Presence Tests & userId Persistence
+**Date:** 2026-06-18
+**Duration:** ~30 min
+**PR:** [#7](https://github.com/odeds/kanaban/pull/7)
+
+I also added a small fix to persist the userId in localStorage so identity survives a page refresh — the client sends the stored id as a query param on connect, and the server reuses it if it recognises it.
+
+On the testing side, I kept scope deliberately narrow. The assignment doesn't require tests, but I added unit tests for `PresenceManager` since the `generate(hint?)` logic has a real behavioral branch worth pinning down — reuse a known user or generate fresh. No mocks, no edge-case hunting, just enough coverage to catch a regression in the core logic. The same philosophy applied earlier to `columnUtils`: test the algorithmic pieces that are easy to break silently, skip the plumbing.
+
+---
+
 ## Closing Remarks — Comparison & Recommendation
 
 For this app, I'd choose Zustand. The board's state is small — a card dictionary, three ordered id-lists, two user lists, and a status flag — and the dominant pattern is optimistic-update-then-reconcile against the WebSocket broadcast. Zustand expresses that as a direct `set()` with manual rollback in a `try/catch`. Redux Toolkit models the same flow as a pair of named actions (an optimistic action, then the WS echo), which buys an inspectable action log and time-travel debugging but costs boilerplate — a slice, a reducer per message type, thunks, and a Provider — that this app's complexity doesn't repay.
