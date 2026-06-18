@@ -2,10 +2,12 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CardForm } from '../CardForm';
 
+const TEST_USERS = ['Alice', 'Bob'];
+
 function setup(initialValues?: Parameters<typeof CardForm>[0]['initialValues']) {
   const onSubmit = vi.fn();
   const onCancel = vi.fn();
-  render(<CardForm onSubmit={onSubmit} onCancel={onCancel} initialValues={initialValues} />);
+  render(<CardForm onSubmit={onSubmit} onCancel={onCancel} initialValues={initialValues} users={TEST_USERS} />);
   return { onSubmit, onCancel };
 }
 
@@ -26,12 +28,12 @@ describe('CardForm', () => {
     const { onSubmit } = setup();
     await userEvent.type(screen.getByTestId('input-title'), '  Fix login bug  ');
     await userEvent.type(screen.getByTestId('input-description'), 'Fails on Safari');
-    await userEvent.type(screen.getByTestId('input-assignee'), 'Oded');
+    await userEvent.selectOptions(screen.getByTestId('input-assignee'), 'Alice');
     await userEvent.click(screen.getByTestId('form-submit'));
     expect(onSubmit).toHaveBeenCalledWith({
       title: 'Fix login bug',
       description: 'Fails on Safari',
-      assignee: 'Oded',
+      assignee: 'Alice',
     });
   });
 

@@ -15,6 +15,7 @@ export function CardActions({ onEdit, onDelete }: CardActionsProps) {
         className="h-6 w-6"
         onClick={onEdit}
         aria-label="Edit card"
+        title="Edit card"
       >
         <Pencil className="h-3 w-3" />
       </Button>
@@ -24,6 +25,7 @@ export function CardActions({ onEdit, onDelete }: CardActionsProps) {
         className="h-6 w-6 text-destructive hover:text-destructive"
         onClick={onDelete}
         aria-label="Delete card"
+        title="Delete card"
       >
         <Trash2 className="h-3 w-3" />
       </Button>

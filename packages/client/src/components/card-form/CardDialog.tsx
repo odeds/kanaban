@@ -12,9 +12,10 @@ interface CardDialogProps {
   onSubmit: (values: CardFormValues) => void;
   mode: 'create' | 'edit';
   initialValues?: Partial<CardFormValues>;
+  users: string[];
 }
 
-export function CardDialog({ open, onClose, onSubmit, mode, initialValues }: CardDialogProps) {
+export function CardDialog({ open, onClose, onSubmit, mode, initialValues, users }: CardDialogProps) {
   function handleSubmit(values: CardFormValues) {
     onSubmit(values);
     onClose();
@@ -28,6 +29,7 @@ export function CardDialog({ open, onClose, onSubmit, mode, initialValues }: Car
         </DialogHeader>
         <CardForm
           initialValues={initialValues}
+          users={users}
           onSubmit={handleSubmit}
           onCancel={onClose}
           submitLabel={mode === 'create' ? 'Add card' : 'Save changes'}

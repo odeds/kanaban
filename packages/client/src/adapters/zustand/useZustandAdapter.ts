@@ -4,12 +4,13 @@ import { useTransportEffect } from '@/adapters/useTransportEffect';
 import { useZustandStore } from './store';
 
 export function useZustandAdapter(): AdapterState {
-  const { cards, columnCardIds, userIds, createCard, updateCard, deleteCard, moveCard } =
+  const { cards, columnCardIds, userIds, allUserIds, createCard, updateCard, deleteCard, moveCard } =
     useZustandStore(
       useShallow((s) => ({
         cards: s.cards,
         columnCardIds: s.columnCardIds,
         userIds: s.userIds,
+        allUserIds: s.allUserIds,
         createCard: s.createCard,
         updateCard: s.updateCard,
         deleteCard: s.deleteCard,
@@ -24,6 +25,7 @@ export function useZustandAdapter(): AdapterState {
     cards,
     columnCardIds,
     userIds,
+    allUserIds,
     onCreateCard: createCard,
     onEditCard: updateCard,
     onDeleteCard: deleteCard,

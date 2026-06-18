@@ -14,13 +14,14 @@ interface ColumnProps {
   cards: Card[];
   isFirst: boolean;
   isLast: boolean;
+  users: string[];
   onCreateCard: (columnId: ColumnId, values: CardFormValues) => void;
   onEditCard: (cardId: string, values: CardFormValues) => void;
   onDeleteCard: (cardId: string) => void;
   onMoveCard: (cardId: string, direction: 'left' | 'right') => void;
 }
 
-export function Column({ id, title, cards, isFirst, isLast, onCreateCard, onEditCard, onDeleteCard, onMoveCard }: ColumnProps) {
+export function Column({ id, title, cards, isFirst, isLast, users, onCreateCard, onEditCard, onDeleteCard, onMoveCard }: ColumnProps) {
   const [addOpen, setAddOpen] = useState(false);
 
   return (
@@ -35,6 +36,7 @@ export function Column({ id, title, cards, isFirst, isLast, onCreateCard, onEdit
               card={card}
               canMoveLeft={!isFirst}
               canMoveRight={!isLast}
+              users={users}
               onEdit={onEditCard}
               onDelete={onDeleteCard}
               onMoveLeft={(cardId) => onMoveCard(cardId, 'left')}
@@ -59,6 +61,7 @@ export function Column({ id, title, cards, isFirst, isLast, onCreateCard, onEdit
         onClose={() => setAddOpen(false)}
         onSubmit={(values) => onCreateCard(id, values)}
         mode="create"
+        users={users}
       />
     </div>
   );

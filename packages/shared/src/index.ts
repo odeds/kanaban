@@ -63,19 +63,20 @@ export type Board = Static<typeof BoardSchema>;
 // Plain TypeScript unions — used for WS protocol only, not HTTP schema validation.
 
 export type ServerMessage =
+  | { type: 'session:init'; userId: string }
   | { type: 'board:state'; board: Board }
   | { type: 'card:created'; card: Card }
   | { type: 'card:updated'; card: Card }
   | { type: 'card:deleted'; cardId: string }
   | { type: 'card:moved'; cardId: string; columnId: ColumnId; order: number }
-  | { type: 'presence:update'; userIds: string[] };
+  | { type: 'presence:update'; userIds: string[] }
+  | { type: 'users:update'; userIds: string[] };
 
 export type ClientMessage =
   | { type: 'card:create'; title: string; description: string; assignee: string; columnId: ColumnId }
   | { type: 'card:update'; cardId: string; title?: string; description?: string; assignee?: string }
   | { type: 'card:delete'; cardId: string }
-  | { type: 'card:move'; cardId: string; columnId: ColumnId; order: number }
-  | { type: 'presence:join'; userId: string };
+  | { type: 'card:move'; cardId: string; columnId: ColumnId; order: number };
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 

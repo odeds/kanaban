@@ -10,13 +10,14 @@ interface CardItemProps {
   card: Card;
   canMoveLeft: boolean;
   canMoveRight: boolean;
+  users: string[];
   onEdit: (cardId: string, values: CardFormValues) => void;
   onDelete: (cardId: string) => void;
   onMoveLeft: (cardId: string) => void;
   onMoveRight: (cardId: string) => void;
 }
 
-export function CardItem({ card, canMoveLeft, canMoveRight, onEdit, onDelete, onMoveLeft, onMoveRight }: CardItemProps) {
+export function CardItem({ card, canMoveLeft, canMoveRight, users, onEdit, onDelete, onMoveLeft, onMoveRight }: CardItemProps) {
   const [editOpen, setEditOpen] = useState(false);
 
   return (
@@ -42,6 +43,7 @@ export function CardItem({ card, canMoveLeft, canMoveRight, onEdit, onDelete, on
         onSubmit={(values) => onEdit(card.id, values)}
         mode="edit"
         initialValues={{ title: card.title, description: card.description, assignee: card.assignee }}
+        users={users}
       />
     </>
   );
