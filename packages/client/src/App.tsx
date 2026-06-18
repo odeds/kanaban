@@ -1,10 +1,8 @@
-import { Board } from '@/components/board/Board';
-import { useZustandAdapter } from '@/adapters/zustand/useZustandAdapter';
+import { ZustandAdapter } from '@/adapters/zustand/ZustandAdapter';
+import { ReduxAdapter } from '@/adapters/redux/ReduxAdapter';
 
-// To add a second adapter: import it here and switch on import.meta.env.VITE_STATE_ADAPTER.
 function App() {
-  const adapter = useZustandAdapter();
-  return <Board {...adapter} />;
+  return import.meta.env.VITE_STATE_ADAPTER === 'redux' ? <ReduxAdapter /> : <ZustandAdapter />;
 }
 
 export default App;

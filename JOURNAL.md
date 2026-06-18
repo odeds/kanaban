@@ -52,3 +52,12 @@ This step focused on adding the data layer to the backend and wiring up WebSocke
 This step focused on building the shared UI layer that the state adapters will consume. The components are intentionally dumb — they receive data and callbacks via props and hold no app state of their own. For card movement, I chose left/right arrow buttons rather than drag-and-drop, since drag-and-drop is explicitly out of scope. Alongside the board components, I installed the building blocks they rely on: shadcn/ui for styled atoms and Base UI for accessible, aria-compatible headless primitives. I also skipped Storybook — in my experience it tends to go unused, and with LLMs it's trivial to generate component stories later if they're ever needed.
 
 ---
+
+## Step 6 — Zustand State Adapter
+**Date:** 2026-06-17
+**Duration:** ~45 min
+**PR:** [#5](https://github.com/odeds/kanaban/pull/5)
+
+This step introduced the adapter infrastructure that all state implementations will plug into, then replaced the placeholder stub with a real Zustand adapter. I chose Zustand as the first adapter because it keeps state management close to its simplest possible form — state is just data, and updates are plain function calls. There's no ceremony around actions, reducers, or subscriptions; the store is a flat object you read and mutate directly. That makes it a useful baseline: easy to reason about, and a clean reference point for comparing the approaches that follow.
+
+---

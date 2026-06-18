@@ -3,11 +3,10 @@ import { devtools } from 'zustand/middleware';
 import type { Card, ColumnId, ServerMessage } from '@kanaban/shared';
 import { COLUMN_IDS } from '@kanaban/shared';
 import { wsTransport } from '@/lib/ws-transport';
+import { api } from '@/lib/api';
 import type { CardFormValues } from '@/components/card-form/CardForm';
-
-const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:3001';
-
-const EMPTY_COLUMNS: Record<ColumnId, string[]> = { todo: [], 'in-progress': [], done: [] };
+import { EMPTY_COLUMNS, generateUserId } from '@/adapters/constants';
+import { reorderColumns } from '@/adapters/columnUtils';
 
 interface State {
   cards: Record<string, Card>;
@@ -34,7 +33,7 @@ export const useZustandStore = create<State & Actions>()(
       columnCardIds: { ...EMPTY_COLUMNS },
       userIds: [],
       status: 'disconnected',
-      userId: `user-${Math.random().toString(36).slice(2, 8)}`,
+      userId: generateUserId(),
 
       // ── Server message handler ─────────────────────────────────────────────────
       applyServerMsg(msg: ServerMessage) {
@@ -90,29 +89,9 @@ export const useZustandStore = create<State & Actions>()(
             set((s) => {
               const card = s.cards[msg.cardId];
               if (!card) return {};
-              const oldColId = card.columnId;
-              const newColId = msg.columnId;
-              const updatedCard = { ...card, columnId: newColId, order: msg.order };
-
-              // Remove from source; for same-column reorder, base off source without the card
-              const sourceIds = s.columnCardIds[oldColId].filter((id) => id !== msg.cardId);
-              const targetBase =
-                oldColId === newColId
-                  ? sourceIds
-                  : s.columnCardIds[newColId].filter((id) => id !== msg.cardId);
-              const targetIds = [
-                ...targetBase.slice(0, msg.order),
-                msg.cardId,
-                ...targetBase.slice(msg.order),
-              ];
-
               return {
-                cards: { ...s.cards, [msg.cardId]: updatedCard },
-                columnCardIds: {
-                  ...s.columnCardIds,
-                  [oldColId]: sourceIds,
-                  [newColId]: targetIds,
-                },
+                cards: { ...s.cards, [msg.cardId]: { ...card, columnId: msg.columnId, order: msg.order } },
+                columnCardIds: reorderColumns(s.columnCardIds, msg.cardId, card.columnId, msg.columnId, msg.order),
               };
             }, false, 'card:moved');
             break;
@@ -128,16 +107,11 @@ export const useZustandStore = create<State & Actions>()(
 
       async createCard(columnId, values) {
         // No optimistic update: state arrives via card:created WS broadcast.
-        await fetch(`${API_BASE}/api/cards`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...values, columnId }),
-        });
+        await api.createCard(columnId, values);
       },
 
       async updateCard(cardId, values) {
         const prev = get().cards[cardId];
-        // Optimistic patch
         set(
           (s) => ({
             cards: {
@@ -149,11 +123,7 @@ export const useZustandStore = create<State & Actions>()(
           'updateCard:optimistic',
         );
         try {
-          await fetch(`${API_BASE}/api/cards/${cardId}`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(values),
-          });
+          await api.updateCard(cardId, values);
         } catch {
           if (prev) {
             set((s) => ({ cards: { ...s.cards, [cardId]: prev } }), false, 'updateCard:rollback');
@@ -165,7 +135,6 @@ export const useZustandStore = create<State & Actions>()(
         const s = get();
         const card = s.cards[cardId];
         if (!card) return;
-        // Optimistic removal
         const { [cardId]: _removed, ...remainingCards } = s.cards;
         set(
           {
@@ -179,7 +148,7 @@ export const useZustandStore = create<State & Actions>()(
           'deleteCard:optimistic',
         );
         try {
-          await fetch(`${API_BASE}/api/cards/${cardId}`, { method: 'DELETE' });
+          await api.deleteCard(cardId);
         } catch {
           set({ cards: s.cards, columnCardIds: s.columnCardIds }, false, 'deleteCard:rollback');
         }
@@ -195,27 +164,18 @@ export const useZustandStore = create<State & Actions>()(
         const targetColId = COLUMN_IDS[targetIndex];
         const targetOrder = s.columnCardIds[targetColId].length;
 
-        // Optimistic move
         const prevCards = s.cards;
         const prevColIds = s.columnCardIds;
         set(
           (st) => ({
             cards: { ...st.cards, [cardId]: { ...card, columnId: targetColId, order: targetOrder } },
-            columnCardIds: {
-              ...st.columnCardIds,
-              [card.columnId]: st.columnCardIds[card.columnId].filter((id) => id !== cardId),
-              [targetColId]: [...st.columnCardIds[targetColId], cardId],
-            },
+            columnCardIds: reorderColumns(st.columnCardIds, cardId, card.columnId, targetColId, targetOrder),
           }),
           false,
           'moveCard:optimistic',
         );
         try {
-          await fetch(`${API_BASE}/api/cards/${cardId}/move`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ columnId: targetColId, order: targetOrder }),
-          });
+          await api.moveCard(cardId, targetColId, targetOrder);
         } catch {
           set({ cards: prevCards, columnCardIds: prevColIds }, false, 'moveCard:rollback');
         }
