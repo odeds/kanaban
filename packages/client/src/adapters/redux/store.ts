@@ -6,13 +6,14 @@ import { COLUMN_IDS } from '@kanaban/shared';
 import { wsTransport } from '@/lib/ws-transport';
 import { api } from '@/lib/api';
 import type { CardFormValues } from '@/components/card-form/CardForm';
-import { EMPTY_COLUMNS, generateUserId } from '@/adapters/constants';
+import { EMPTY_COLUMNS } from '@/adapters/constants';
 import { reorderColumns } from '@/adapters/columnUtils';
 
 interface BoardState {
   cards: Record<string, Card>;
   columnCardIds: Record<ColumnId, string[]>;
   userIds: string[];
+  allUserIds: string[];
   status: 'connected' | 'disconnected' | 'reconnecting';
   userId: string;
 }
@@ -21,8 +22,9 @@ const initialState: BoardState = {
   cards: {},
   columnCardIds: { ...EMPTY_COLUMNS },
   userIds: [],
+  allUserIds: [],
   status: 'disconnected',
-  userId: generateUserId(),
+  userId: '',
 };
 
 // ── Slice ──────────────────────────────────────────────────────────────────────
@@ -80,8 +82,16 @@ const boardSlice = createSlice({
       );
     },
 
+    sessionInitReceived(state, action: PayloadAction<string>) {
+      state.userId = action.payload;
+    },
+
     presenceUpdated(state, action: PayloadAction<string[]>) {
       state.userIds = action.payload;
+    },
+
+    allUsersUpdated(state, action: PayloadAction<string[]>) {
+      state.allUserIds = action.payload;
     },
 
     statusChanged(
@@ -164,8 +174,15 @@ export function applyServerMsg(msg: ServerMessage): AppThunk {
       case 'card:moved':
         dispatch(actions.cardMoved({ cardId: msg.cardId, columnId: msg.columnId, order: msg.order }));
         break;
+      case 'session:init':
+        localStorage.setItem('kanaban:userId', msg.userId);
+        dispatch(actions.sessionInitReceived(msg.userId));
+        break;
       case 'presence:update':
         dispatch(actions.presenceUpdated(msg.userIds));
+        break;
+      case 'users:update':
+        dispatch(actions.allUsersUpdated(msg.userIds));
         break;
     }
   };
@@ -236,13 +253,12 @@ export const moveCard =
 // ── Transport ─────────────────────────────────────────────────────────────────
 
 export function initTransport(): () => void {
-  const { userId } = store.getState().board;
-  wsTransport.connect();
+  const storedUserId = localStorage.getItem('kanaban:userId') ?? undefined;
+  wsTransport.connect(storedUserId);
 
   const unsubMsg = wsTransport.subscribe((msg) => store.dispatch(applyServerMsg(msg)));
   const unsubStatus = wsTransport.onStatus((status) => {
     store.dispatch(actions.statusChanged(status));
-    if (status === 'connected') wsTransport.send({ type: 'presence:join', userId });
   });
 
   return () => {

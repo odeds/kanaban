@@ -23,6 +23,7 @@ export function useReduxAdapter(): AdapterState {
   const cards = useAppSelector((s) => s.board.cards);
   const columnCardIds = useAppSelector((s) => s.board.columnCardIds);
   const userIds = useAppSelector((s) => s.board.userIds);
+  const allUserIds = useAppSelector((s) => s.board.allUserIds);
 
   useTransportEffect(initTransport);
 
@@ -30,6 +31,7 @@ export function useReduxAdapter(): AdapterState {
     cards,
     columnCardIds,
     userIds,
+    allUserIds,
     onCreateCard: (columnId, values) => dispatch(createCard(columnId, values)),
     onEditCard: (cardId, values) => dispatch(updateCard(cardId, values)),
     onDeleteCard: (cardId) => dispatch(deleteCard(cardId)),

@@ -5,6 +5,7 @@ export interface AdapterState {
   cards: Record<string, Card>;
   columnCardIds: Record<ColumnId, string[]>;
   userIds: string[];
+  allUserIds: string[];
   onCreateCard: (columnId: ColumnId, values: CardFormValues) => void;
   onEditCard: (cardId: string, values: CardFormValues) => void;
   onDeleteCard: (cardId: string) => void;

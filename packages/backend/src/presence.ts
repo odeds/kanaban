@@ -1,18 +1,26 @@
-class PresenceManager {
-  private users = new Set<string>();
+export class PresenceManager {
+  private online = new Set<string>();
+  private all = new Set<string>();
 
-  join(userId: string): string[] {
-    this.users.add(userId);
-    return [...this.users];
+  generate(hint?: string): string {
+    const userId = hint && this.all.has(hint)
+      ? hint
+      : `user-${Math.random().toString(36).slice(2, 8)}`;
+    this.online.add(userId);
+    this.all.add(userId);
+    return userId;
   }
 
-  leave(userId: string): string[] {
-    this.users.delete(userId);
-    return [...this.users];
+  leave(userId: string): void {
+    this.online.delete(userId);
   }
 
-  getUsers(): string[] {
-    return [...this.users];
+  getOnlineUsers(): string[] {
+    return [...this.online];
+  }
+
+  getAllUsers(): string[] {
+    return [...this.all];
   }
 }
 

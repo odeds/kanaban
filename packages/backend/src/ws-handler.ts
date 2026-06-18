@@ -8,16 +8,20 @@ import { addClient, removeClient, broadcast, sendTo } from './broadcast';
 export function handleWsConnection(socket: WebSocket, _req: FastifyRequest): void {
   addClient(socket);
 
-  // Send current board state to the new client
+  const hintId = (_req.query as Record<string, string>)['userId'];
+  const userId = presence.generate(hintId);
+
+  // Tell this client its assigned identity
+  sendTo(socket, { type: 'session:init', userId });
+  // Send current board state
   sendTo(socket, { type: 'board:state', board: store.getBoard() });
+  // Send all-time user list and current online presence
+  sendTo(socket, { type: 'users:update', userIds: presence.getAllUsers() });
+  sendTo(socket, { type: 'presence:update', userIds: presence.getOnlineUsers() });
 
-  // Send current presence so new client knows who's online
-  const currentUsers = presence.getUsers();
-  if (currentUsers.length > 0) {
-    sendTo(socket, { type: 'presence:update', userIds: currentUsers });
-  }
-
-  let joinedUserId: string | null = null;
+  // Broadcast updated lists to everyone else
+  broadcast({ type: 'users:update', userIds: presence.getAllUsers() });
+  broadcast({ type: 'presence:update', userIds: presence.getOnlineUsers() });
 
   socket.on('message', (rawData: RawData) => {
     let msg: ClientMessage;
@@ -69,21 +73,12 @@ export function handleWsConnection(socket: WebSocket, _req: FastifyRequest): voi
         }
         break;
       }
-
-      case 'presence:join': {
-        joinedUserId = msg.userId;
-        const userIds = presence.join(msg.userId);
-        broadcast({ type: 'presence:update', userIds });
-        break;
-      }
     }
   });
 
   socket.on('close', () => {
     removeClient(socket);
-    if (joinedUserId) {
-      const userIds = presence.leave(joinedUserId);
-      broadcast({ type: 'presence:update', userIds });
-    }
+    presence.leave(userId);
+    broadcast({ type: 'presence:update', userIds: presence.getOnlineUsers() });
   });
 }

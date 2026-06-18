@@ -5,31 +5,62 @@
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
   --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
   --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-sm: calc(var(--radius) * 0.6);
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --border: oklch(0.922 0 0);
-  --radius: 0.625rem;
-}
+  /* Clean white background with the faintest blue tint */
+  --background: oklch(0.98 0.006 265);
+  --foreground: oklch(0.14 0.02 265);
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --border: oklch(0.269 0 0);
+  /* Cards — pure white */
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.14 0.02 265);
+
+  /* Dialogs */
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.14 0.02 265);
+
+  /* Indigo-blue primary for buttons and focus */
+  --primary: oklch(0.52 0.20 265);
+  --primary-foreground: oklch(0.99 0 0);
+
+  /* Light indigo-tinted surface for secondary badges */
+  --secondary: oklch(0.93 0.03 265);
+  --secondary-foreground: oklch(0.30 0.10 265);
+
+  /* Slightly tinted off-white for column backgrounds */
+  --muted: oklch(0.95 0.015 265);
+  --muted-foreground: oklch(0.50 0.05 265);
+
+  /* Hover states */
+  --accent: oklch(0.93 0.03 265);
+  --accent-foreground: oklch(0.25 0.08 265);
+
+  --destructive: oklch(0.60 0.22 25);
+
+  /* Soft indigo-tinted borders */
+  --border: oklch(0.88 0.03 265);
+  --input: oklch(0.88 0.03 265);
+  --ring: oklch(0.52 0.20 265);
+
+  --radius: 0.5rem;
 }
 
 @layer base {

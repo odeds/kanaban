@@ -5,13 +5,14 @@ import { COLUMN_IDS } from '@kanaban/shared';
 import { wsTransport } from '@/lib/ws-transport';
 import { api } from '@/lib/api';
 import type { CardFormValues } from '@/components/card-form/CardForm';
-import { EMPTY_COLUMNS, generateUserId } from '@/adapters/constants';
+import { EMPTY_COLUMNS } from '@/adapters/constants';
 import { reorderColumns } from '@/adapters/columnUtils';
 
 interface State {
   cards: Record<string, Card>;
   columnCardIds: Record<ColumnId, string[]>;
   userIds: string[];
+  allUserIds: string[];
   status: 'connected' | 'disconnected' | 'reconnecting';
   userId: string;
 }
@@ -32,8 +33,9 @@ export const useZustandStore = create<State & Actions>()(
       cards: {},
       columnCardIds: { ...EMPTY_COLUMNS },
       userIds: [],
+      allUserIds: [],
       status: 'disconnected',
-      userId: generateUserId(),
+      userId: '',
 
       // ── Server message handler ─────────────────────────────────────────────────
       applyServerMsg(msg: ServerMessage) {
@@ -96,8 +98,17 @@ export const useZustandStore = create<State & Actions>()(
             }, false, 'card:moved');
             break;
           }
+          case 'session:init': {
+            localStorage.setItem('kanaban:userId', msg.userId);
+            set({ userId: msg.userId }, false, 'session:init');
+            break;
+          }
           case 'presence:update': {
             set({ userIds: msg.userIds }, false, 'presence:update');
+            break;
+          }
+          case 'users:update': {
+            set({ allUserIds: msg.userIds }, false, 'users:update');
             break;
           }
         }
@@ -184,15 +195,13 @@ export const useZustandStore = create<State & Actions>()(
       // ── Transport ──────────────────────────────────────────────────────────────
 
       initTransport() {
-        const { userId, applyServerMsg } = get();
-        wsTransport.connect();
+        const { applyServerMsg } = get();
+        const storedUserId = localStorage.getItem('kanaban:userId') ?? undefined;
+        wsTransport.connect(storedUserId);
 
         const unsubMsg = wsTransport.subscribe(applyServerMsg);
         const unsubStatus = wsTransport.onStatus((status) => {
           set({ status }, false, `status:${status}`);
-          if (status === 'connected') {
-            wsTransport.send({ type: 'presence:join', userId });
-          }
         });
 
         return () => {
