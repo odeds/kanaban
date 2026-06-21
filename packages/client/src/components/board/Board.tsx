@@ -16,7 +16,7 @@ export interface BoardProps {
 }
 
 const ADAPTER_LABEL: Record<string, string> = {
-  redux: 'Redux',
+  thunks: 'Redux Thunks',
   zustand: 'Zustand',
   saga: 'Redux Saga',
 };

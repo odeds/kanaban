@@ -21,7 +21,7 @@ Set `VITE_STATE_ADAPTER` at dev/build time:
 npm run dev -w packages/client
 
 # Redux + Thunks
-VITE_STATE_ADAPTER=redux npm run dev -w packages/client
+VITE_STATE_ADAPTER=thunks npm run dev -w packages/client
 
 # Redux + Saga
 VITE_STATE_ADAPTER=saga npm run dev -w packages/client

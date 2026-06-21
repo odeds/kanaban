@@ -3,7 +3,7 @@ import { lazy, Suspense } from 'react';
 const adapter = import.meta.env.VITE_STATE_ADAPTER;
 
 const AdapterComponent =
-  adapter === 'redux'
+  adapter === 'thunks'
     ? lazy(() => import('@/adapters/redux/thunks/ThunksAdapter').then((m) => ({ default: m.ThunksAdapter })))
     : adapter === 'saga'
     ? lazy(() => import('@/adapters/redux/saga/SagaAdapter').then((m) => ({ default: m.SagaAdapter })))
