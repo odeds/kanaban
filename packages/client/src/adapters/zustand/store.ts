@@ -5,8 +5,8 @@ import { COLUMN_IDS } from '@kanaban/shared';
 import { wsTransport } from '@/lib/ws-transport';
 import { api } from '@/lib/api';
 import type { CardFormValues } from '@/components/card-form/CardForm';
-import { EMPTY_COLUMNS } from '@/adapters/constants';
-import { reorderColumns } from '@/adapters/columnUtils';
+import { EMPTY_COLUMNS, USER_ID_STORAGE_KEY } from '@/adapters/constants';
+import { reorderColumns, resolveMove } from '@/adapters/columnUtils';
 
 interface State {
   cards: Record<string, Card>;
@@ -99,7 +99,7 @@ export const useZustandStore = create<State & Actions>()(
             break;
           }
           case 'session:init': {
-            localStorage.setItem('kanaban:userId', msg.userId);
+            localStorage.setItem(USER_ID_STORAGE_KEY, msg.userId);
             set({ userId: msg.userId }, false, 'session:init');
             break;
           }
@@ -169,11 +169,9 @@ export const useZustandStore = create<State & Actions>()(
         const s = get();
         const card = s.cards[cardId];
         if (!card) return;
-        const colIndex = COLUMN_IDS.indexOf(card.columnId);
-        const targetIndex = direction === 'left' ? colIndex - 1 : colIndex + 1;
-        if (targetIndex < 0 || targetIndex >= COLUMN_IDS.length) return;
-        const targetColId = COLUMN_IDS[targetIndex];
-        const targetOrder = s.columnCardIds[targetColId].length;
+        const move = resolveMove(s.columnCardIds, card, direction);
+        if (!move) return;
+        const { targetColId, targetOrder } = move;
 
         const prevCards = s.cards;
         const prevColIds = s.columnCardIds;
@@ -196,7 +194,7 @@ export const useZustandStore = create<State & Actions>()(
 
       initTransport() {
         const { applyServerMsg } = get();
-        const storedUserId = localStorage.getItem('kanaban:userId') ?? undefined;
+        const storedUserId = localStorage.getItem(USER_ID_STORAGE_KEY) ?? undefined;
         wsTransport.connect(storedUserId);
 
         const unsubMsg = wsTransport.subscribe(applyServerMsg);
