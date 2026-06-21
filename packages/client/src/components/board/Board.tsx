@@ -16,8 +16,9 @@ export interface BoardProps {
 }
 
 const ADAPTER_LABEL: Record<string, string> = {
-  redux: 'Redux',
+  thunks: 'Redux Thunks',
   zustand: 'Zustand',
+  saga: 'Redux Saga',
 };
 
 const activeAdapter = import.meta.env.VITE_STATE_ADAPTER ?? 'zustand';

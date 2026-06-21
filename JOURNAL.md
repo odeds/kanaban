@@ -73,30 +73,30 @@ The reuse audit turned up more duplication than expected. `EMPTY_COLUMNS`, `gene
 
 ---
 
-## Step 8 — UI/UX Polish, Manual Testing & Docs
+## Step 8 — UI/UX Polish, Testing & Docs
 **Date:** 2026-06-18
-**Duration:** ~1.5 hr
+**Duration:** ~2 hr
 **PR:** [#7](https://github.com/odeds/kanaban/pull/7)
 
-With both adapters working, I spent a session on light UI/UX improvements, manual testing, and documentation. On the UX side I switched the card assignee from a free-text input to a dropdown of real users, and moved user-ID generation from the client to the server so a user persists in the all-time assignee list even after disconnecting. I also reworked the theme to a clean light palette with subtle color accents, centered the board within a max-width container, enlarged the move arrows and split them to opposite sides of each card, and added tooltips to the icon buttons. I manually tested the real-time flow across two browser windows — create, edit, delete, move, presence, and optimistic updates all syncing live. Finally I drafted the README: run instructions, how to switch adapters, and the full WebSocket and REST event protocol.
+With both adapters working, I spent a session on UI/UX improvements, correctness fixes, manual testing, and documentation. On the UX side I switched the card assignee from a free-text input to a dropdown of real users, moved user-ID generation from the client to the server, and added localStorage persistence for userId so identity survives a page refresh — the client sends the stored id as a query param on connect, and the server reuses it if it recognises it. I also reworked the theme to a clean light palette with subtle color accents, centered the board in a max-width container, enlarged the move arrows and split them to opposite sides of each card, and added tooltips to the icon buttons. I manually tested the full real-time flow across two browser windows — create, edit, delete, move, presence, and optimistic updates all syncing live. I finished by drafting the README and adding unit tests for `PresenceManager`: the `generate(hint?)` logic has a real behavioral branch worth pinning — reuse a known user or generate fresh. Scope was kept deliberately narrow: test the algorithmic pieces that are easy to break silently, skip the plumbing.
 
 ---
 
-## Step 9 — Presence Tests & userId Persistence
-**Date:** 2026-06-18
-**Duration:** ~30 min
-**PR:** [#7](https://github.com/odeds/kanaban/pull/7)
+## Step 9 — Redux Saga Adapter
+**Date:** 2026-06-21
+**Duration:** ~1 hr
+**PR:** [#8](https://github.com/odeds/kanaban/pull/8)
 
-I also added a small fix to persist the userId in localStorage so identity survives a page refresh — the client sends the stored id as a query param on connect, and the server reuses it if it recognises it.
-
-On the testing side, I kept scope deliberately narrow. The assignment doesn't require tests, but I added unit tests for `PresenceManager` since the `generate(hint?)` logic has a real behavioral branch worth pinning down — reuse a known user or generate fresh. No mocks, no edge-case hunting, just enough coverage to catch a regression in the core logic. The same philosophy applied earlier to `columnUtils`: test the algorithmic pieces that are easy to break silently, skip the plumbing.
+In this step I added a third state adapter using Redux Saga (`VITE_STATE_ADAPTER=saga`). The core refactor was pulling the RTK slice into a shared `redux/slice.ts` consumed by both Redux adapters — reducers are identical regardless of how effects are orchestrated, so there was no reason to duplicate them. I then restructured `adapters/redux/` into `thunks/` and `saga/` sub-folders. The adapter selection in App.tsx is now lazy-loaded, since it's determined at build time via an env var and only one bundle is ever needed. I also extracted the `resolveMove` logic that was duplicated across all three adapters into a shared helper, and added unit tests for it along with `makeBoard`.
 
 ---
 
 ## Closing Remarks — Comparison & Recommendation
 
-For this app, I'd choose Zustand. The board's state is small — a card dictionary, three ordered id-lists, two user lists, and a status flag — and the dominant pattern is optimistic-update-then-reconcile against the WebSocket broadcast. Zustand expresses that as a direct `set()` with manual rollback in a `try/catch`. Redux Toolkit models the same flow as a pair of named actions (an optimistic action, then the WS echo), which buys an inspectable action log and time-travel debugging but costs boilerplate — a slice, a reducer per message type, thunks, and a Provider — that this app's complexity doesn't repay.
+For this app, I'd choose Zustand. The board's state is small — a card dictionary, three ordered id-lists, two user lists, and a status flag — and the dominant pattern is optimistic-update-then-reconcile against the WebSocket broadcast. Zustand expresses that as a direct `set()` with manual rollback in a `try/catch`. Redux Toolkit models the same flow as a pair of named actions (an optimistic action, then the WS echo), which buys an inspectable action log and time-travel debugging but costs boilerplate — a slice, a reducer per message type, middleware, and a Provider — that this app's complexity doesn't repay.
 
-The recommendation flips to Redux once the app grows: an audit trail of who moved what and when, middleware intercepting every mutation for analytics/permissions/logging, real conflict resolution, or multiple teams contributing to the same state. At that point the named-event model and the DevTools action log start paying for themselves.
+The most interesting structural finding from having three adapters is that Thunks and Saga share an *identical* `slice.ts`. Reducers are pure state transitions that don't care how side effects are orchestrated, so the entire Thunks → Saga swap happens purely in the effects layer. That reframes the comparison: Thunks and Saga are different answers to "how should effects be structured?", while Zustand is a different answer to "should state and effects be separated at all?"
 
-A few honest trade-offs I noticed while building. First, Zustand's manual rollback is easy to get subtly wrong — every optimistic mutation has to capture the previous state and restore it on failure; Redux centralizes that discipline but doesn't eliminate it. Second, the Step 7 reuse audit showed roughly half of each adapter was identical plumbing — REST calls, the reordering algorithm, the transport effect, shared constants — so the genuinely philosophy-specific code is small. That's a finding in itself: for an app this size, the state library is a smaller decision than it first appears. Third, Redux's value here is observability, not correctness — both adapters produce identical UI behavior.
+The recommendation flips to Redux once the async gets hard: cancel an in-flight request when the user types again, retry with backoff, run a multi-step workflow and roll back everything on failure. That's exactly where Saga's `takeLatest`/`race`/cancellation turn 50 lines of fragile hand-rolled logic into 3 declarative lines. Thunks remain the middle ground — Redux's structure and DevTools without generators. Saga earns its complexity only when the effects do.
+
+A few honest trade-offs I noticed while building. First, Zustand's manual rollback is easy to get subtly wrong — every optimistic mutation has to capture the previous state and restore it on failure; Redux centralizes that discipline but doesn't eliminate it. Second, the Steps 7 (and also 9) reuse audit showed roughly half of each adapter was identical plumbing — REST calls, the reordering algorithm, the transport effect, shared constants — so the genuinely philosophy-specific code is small. That's a finding in itself: for an app this size, the state library is a smaller decision than it first appears. Third, Redux's value here is observability, not correctness — all three adapters produce identical UI behavior.

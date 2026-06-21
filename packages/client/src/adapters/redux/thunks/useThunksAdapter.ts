@@ -10,14 +10,12 @@ import {
   deleteCard,
   moveCard,
 } from './store';
-import type { AppDispatch } from './store';
-
-type RootState = ReturnType<typeof store.getState>;
+import type { AppDispatch, RootState } from './store';
 
 const useAppDispatch = () => useDispatch<AppDispatch>();
 const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 
-export function useReduxAdapter(): AdapterState {
+export function useThunksAdapter(): AdapterState {
   const dispatch = useAppDispatch();
 
   const cards = useAppSelector((s) => s.board.cards);

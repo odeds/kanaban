@@ -1,17 +1,17 @@
 import { Provider } from 'react-redux';
 import { store } from './store';
 import { Board } from '@/components/board/Board';
-import { useReduxAdapter } from './useReduxAdapter';
+import { useThunksAdapter } from './useThunksAdapter';
 
-function ReduxBoard() {
-  const adapter = useReduxAdapter();
+function ThunksBoard() {
+  const adapter = useThunksAdapter();
   return <Board {...adapter} />;
 }
 
-export function ReduxAdapter() {
+export function ThunksAdapter() {
   return (
     <Provider store={store}>
-      <ReduxBoard />
+      <ThunksBoard />
     </Provider>
   );
 }

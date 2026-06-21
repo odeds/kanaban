@@ -14,9 +14,9 @@
       "port": 5173
     },
     {
-      "name": "client-redux",
+      "name": "client-thunks",
       "runtimeExecutable": "sh",
-      "runtimeArgs": ["-c", "VITE_STATE_ADAPTER=redux npm run dev -w packages/client -- --port 5174"],
+      "runtimeArgs": ["-c", "VITE_STATE_ADAPTER=thunks npm run dev -w packages/client -- --port 5174"],
       "port": 5174
     }
   ]
