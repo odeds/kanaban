@@ -1,8 +1,8 @@
 # Kanaban
 
-A real-time collaborative Kanban board (a heavily simplified Trello), built as a test bed for comparing **two different client-side state-management philosophies** against the same UI and backend.
+A real-time collaborative Kanban board (a heavily simplified Trello), built as a test bed for comparing **three different client-side state-management philosophies** against the same UI and backend.
 
-The app is the vehicle; the comparison is the deliverable. See [JOURNAL.md](JOURNAL.md) for the design journal and recommendation, and [`packages/client/src/adapters/README.md`](packages/client/src/adapters/README.md) for the head-to-head between the two state layers.
+The app is the vehicle; the comparison is the deliverable. See [JOURNAL.md](JOURNAL.md) for the design journal and recommendation, and [`packages/client/src/adapters/README.md`](packages/client/src/adapters/README.md) for the head-to-head between the three state layers.
 
 ## What it does
 
@@ -40,22 +40,26 @@ To see real-time sync and presence, open the client in **two browser windows/tab
 
 ## Switching state-management implementations
 
-The state layer is selected at build/dev time with the `VITE_STATE_ADAPTER` environment variable. The UI and backend client are identical across both.
+The state layer is selected at build/dev time with the `VITE_STATE_ADAPTER` environment variable. The UI and backend client are identical across all three.
 
 ```bash
 # Zustand (default — no variable needed)
 npm run dev
 
-# Redux Toolkit
-VITE_STATE_ADAPTER=redux npm run dev
+# Redux Toolkit + Thunks
+VITE_STATE_ADAPTER=thunks npm run dev
+
+# Redux Toolkit + Saga
+VITE_STATE_ADAPTER=saga npm run dev
 ```
 
 | Value | Adapter | Philosophy |
 |---|---|---|
 | _(unset)_ / `zustand` | Zustand | State is just data — mutate it directly |
-| `redux` | Redux Toolkit | State changes are named, inspectable events |
+| `thunks` | Redux Toolkit + Thunks | State changes are named events; side effects as async closures |
+| `saga` | Redux Toolkit + Saga | State changes are named events; side effects as generator sagas |
 
-The active adapter is shown as a badge next to the board title so you can confirm which one is running. A pre-wired `client-redux` profile also exists in `.claude/launch.json` for the preview tooling.
+The active adapter is shown as a badge next to the board title so you can confirm which one is running. A pre-wired `client-thunks` profile also exists in `.claude/launch.json` for the preview tooling.
 
 ## Architecture: commands over REST, events over WebSocket
 
@@ -148,7 +152,7 @@ npm run lint       # lint all packages
 
 - **Backend:** Node.js, Fastify, `@fastify/websocket`, TypeBox (chosen over Express for real-time performance; over Hono since this isn't an edge/serverless target)
 - **Client:** Vite, React, TypeScript, Tailwind CSS v4, shadcn/ui + Base UI primitives
-- **State adapters:** Zustand, Redux Toolkit
+- **State adapters:** Zustand, Redux Toolkit (Thunks), Redux Toolkit + Redux Saga
 - **Tests:** Vitest + Testing Library
 
 ## Assumptions & scope
